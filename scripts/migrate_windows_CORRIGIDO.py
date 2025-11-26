@@ -136,11 +136,24 @@ def migrate_games():
         
         conn = get_connection()
         cursor = conn.cursor()
+        
+        # Verificar se a tabela jogo_detalhes existe
+        try:
+            cursor.execute("SELECT TOP 1 * FROM jogo_detalhes")
+            print("✅ Tabela jogo_detalhes encontrada")
+        except Exception as e:
+            print(f"❌ ERRO: Tabela jogo_detalhes não existe ou está inacessível!")
+            print(f"   Detalhes: {e}")
+            print("\n💡 Você precisa criar a tabela jogo_detalhes primeiro!")
+            return 0
+        
         count = 0
         skipped = 0
         errors = 0
+        detalhes_errors = 0
         
         for idx, row in df.iterrows():
+            midia_id = None
             try:
                 api_id = safe_str(row.get('appid', ''), 255)
                 
@@ -161,7 +174,7 @@ def migrate_games():
                 if not genres or genres == '':
                     genres = 'Desconhecido'
                 
-                # Insere na tabela midias
+                # Inserir na tabela midias
                 cursor.execute("""
                     INSERT INTO midias (titulo, tipo, genero, ano_lancamento, descricao, imagem_url, api_id)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -177,35 +190,51 @@ def migrate_games():
                 
                 midia_id = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
                 
-                # ✅ MUDANÇA: Agora insere em jogo_detalhes (NÃO midia_detalhes)
-                cursor.execute("""
-                    INSERT INTO jogo_detalhes (midia_id, desenvolvedor, plataforma, publisher, quality, categories)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                """, (
-                    midia_id,
-                    safe_str(developers, 500),
-                    'PC',
-                    safe_str(publishers, 500),
-                    safe_float(row.get('quality')),
-                    safe_str(categories, 2000)
-                ))
+                # Inserir na tabela jogo_detalhes com tratamento separado
+                try:
+                    cursor.execute("""
+                        INSERT INTO jogo_detalhes (midia_id, desenvolvedor, plataforma, publisher, quality, categories)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    """, (
+                        midia_id,
+                        safe_str(developers, 500),
+                        'PC',
+                        safe_str(publishers, 500),
+                        safe_float(row.get('quality')),
+                        safe_str(categories, 2000)
+                    ))
+                    
+                except Exception as det_error:
+                    detalhes_errors += 1
+                    if detalhes_errors <= 5:
+                        print(f"\n   ⚠ ERRO ao inserir em jogo_detalhes (linha {idx}):")
+                        print(f"      midia_id: {midia_id}")
+                        print(f"      desenvolvedor: {safe_str(developers, 500)}")
+                        print(f"      publisher: {safe_str(publishers, 500)}")
+                        print(f"      Erro: {det_error}")
                 
                 count += 1
                 if count % 100 == 0:
                     conn.commit()
-                    print(f"   ✓ {count} jogos migrados...")
+                    print(f"   ✓ {count} jogos migrados... (Erros em detalhes: {detalhes_errors})")
                     
             except Exception as e:
                 errors += 1
                 if errors <= 10:
-                    print(f"   ⚠ Erro linha {idx}: {str(e)}")
+                    print(f"   ⚠ Erro geral linha {idx}: {str(e)}")
                 continue
         
         conn.commit()
         conn.close()
         
         print(f"\n✅ Migração concluída!")
-        print(f"   Novos: {count} | Ignorados: {skipped} | Erros: {errors}")
+        print(f"   Novos: {count} | Ignorados: {skipped} | Erros gerais: {errors}")
+        print(f"   ⚠ Erros em jogo_detalhes: {detalhes_errors}")
+        
+        if detalhes_errors > 0:
+            print("\n💡 IMPORTANTE: Os jogos foram salvos em 'midias', mas alguns detalhes")
+            print("   não foram salvos em 'jogo_detalhes'. Verifique a estrutura da tabela!")
+        
         return count
         
     except Exception as e:
@@ -265,7 +294,7 @@ def migrate_music():
                 
                 midia_id = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
                 
-                # ✅ MUDANÇA: Agora insere em musica_detalhes (NÃO midia_detalhes)
+                # Insere em musica_detalhes
                 cursor.execute("""
                     INSERT INTO musica_detalhes (
                         midia_id, artista, album, duracao_ms,
@@ -385,7 +414,7 @@ def migrate_movies():
                 
                 midia_id = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
                 
-                # ✅ MUDANÇA: Agora insere em filme_detalhes (NÃO midia_detalhes)
+                # Insere em filme_detalhes
                 cursor.execute("""
                     INSERT INTO filme_detalhes (
                         midia_id, diretor, elenco, duracao_minutos,
