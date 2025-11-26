@@ -1,0 +1,67 @@
+/* frontend/src/index.css (v3.0 - Design Minimalista) */
+
+/* Importando a fonte Inter para design minimalista */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Definindo variáveis de cor globais para consistência */
+:root {
+  --brand-black: #0a0a0a;
+  --brand-dark-gray: #1a1a1a;
+  --brand-white: #f5f5f5;
+  --text-secondary: #a0a0a0;
+  --brand-games: #2a475e;     /* Azul Steam escuro */
+  --brand-music: #0d7a3f;     /* Verde Spotify escuro */
+  --brand-movies: #8b0000;    /* Vermelho Netflix escuro */
+}
+
+/* Aplicando estilos base para todo o corpo da aplicação */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--brand-black);
+  color: var(--brand-white);
+  overflow-x: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Remove o outline azul padrão em inputs e botões ao focar */
+*:focus {
+  outline: none;
+}
+
+/* Reset de margens e paddings */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Estilos para links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Scroll suave */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Esconde a scrollbar mas mantém a funcionalidade */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Garante que o root element ocupe toda a altura */
+#root {
+  min-height: 100vh;
+}

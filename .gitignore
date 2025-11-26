@@ -1,0 +1,34 @@
+﻿# Arquivo .gitignore para o projeto TFG (COM GIT LFS)
+
+# 1. Dependências do Node.js (Frontend)
+/frontend/node_modules
+/frontend/build
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/.env.local
+/frontend/.env.development.local
+/frontend/.env.test.local
+/frontend/.env.production.local
+
+# 2. Arquivos do Python (Backend)
+# Ignoramos os ambientes virtuais, mas NÃO as pastas de cache
+/backend/venv/
+/backend/*/venv/
+/api-gateway/venv/
+*.venv
+.venv
+
+# Cache do Python e arquivos compilados
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Arquivos de ambiente do Python
+.env
+
+# 3. Arquivos do Sistema Operacional e Editores
+.vscode/
+.DS_Store
+Thumbs.db

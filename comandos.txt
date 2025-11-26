@@ -1,0 +1,79 @@
+
+git lfs install
+git clone https://github.com/alexcristofari/TFG1.2
+cd TFG1.2
+git lfs pull
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Terminal 1: API Gateway
+cd "C:\Users\alexc\Desktop\TFG1.2-react\api-gateway"
+python -m flask --app gateway run --port=5000 --no-reload
+
+
+Terminal 2: Backend de Jogos (Steam)
+cd "C:\Users\alexc\Desktop\TFG1.2-react\backend\steam"
+python -m flask run --port=5001 --no-reload
+
+
+Terminal 3: Backend de Músicas
+cd "C:\Users\alexc\Desktop\TFG1.2-react\backend\music"
+python -m flask run --port=5002 --no-reload
+
+
+Terminal 4: Backend de Filmes
+cd "C:\Users\alexc\Desktop\TFG1.2-react\backend\movies"
+python -m flask run --port=5003 --no-reload
+
+
+Terminal 5: Frontend (React)
+cd "C:\Users\alexc\Desktop\TFG1.2-react\frontend"
+npm start
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ git init
+ 
+ git lfs install
+ git lfs track "*.parquet"
+ git lfs track "*.pkl"
+ git lfs track "*.csv"
+ 
+ # 3. Adiciona todos os arquivos (código, .gitignore, .gitattributes e os caches)
+ git add .
+ 
+ # 4. Cria o primeiro commit, já com tudo configurado corretamente
+ git commit -m "Versão inicial do projeto com Git LFS configurado"
+ 
+ # 5. Renomeia a branch principal para 'main'
+ git branch -M main 
+ # 6. Conecta este repositório local ao repositório CORRETO no GitHub
+ git remote add origin https://github.com/alexcristofari/TFG1.2.git
+ 
+ # 7. Envia tudo para o GitHub. A opção -u configura o rastreamento para futuros pushes.
+ git push -u origin main
+
+ # 8. Mensagem final para você saber que terminou
+ echo "Processo concluído. Verifique seu repositório no GitHub."
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ USE RecomendadorMultimidia;
+
+-- TOP 10 MÚSICAS
+SELECT TOP 10 m.*, md.* 
+FROM midias m 
+JOIN midia_detalhes md ON m.id = md.midia_id 
+WHERE m.tipo = 'musica';
+
+-- TOP 10 FILMES
+SELECT TOP 10 m.*, md.* 
+FROM midias m 
+JOIN midia_detalhes md ON m.id = md.midia_id 
+WHERE m.tipo = 'filme';
+
+-- TOP 10 JOGOS
+SELECT TOP 10 m.*, md.* 
+FROM midias m 
+JOIN midia_detalhes md ON m.id = md.midia_id 
+WHERE m.tipo = 'jogo';

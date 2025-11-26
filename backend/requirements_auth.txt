@@ -1,0 +1,8 @@
+# Dependências adicionais para o sistema de autenticação
+# Execute: pip install -r requirements_auth.txt
+
+bcrypt==4.1.2
+PyJWT==2.8.0
+pyodbc==5.0.1
+python-dotenv==1.0.0
+
