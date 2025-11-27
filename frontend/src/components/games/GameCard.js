@@ -1,5 +1,7 @@
 // frontend/src/components/games/GameCard.js (v5.0 - Padrão Steam Minimalista)
 import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import AddToListModal from '../lists/AddToListModal';
 import { motion } from 'framer-motion';
 
 const CardStyles = () => (
@@ -20,6 +22,24 @@ const CardStyles = () => (
     .game-card-minimal:hover {
       transform: translateY(-4px);
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .add-to-list-button {
+      background-color: #4a9fd8;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      text-align: center;
+    }
+
+    .add-to-list-button:hover {
+      background-color: #3a8ac7;
     }
 
     .game-card-image-wrapper {
@@ -73,7 +93,7 @@ const CardStyles = () => (
       font-size: 0.9rem;
       font-weight: 600;
       color: #f5f5f5;
-      margin: 0;
+      margin: 0 0 8px 0; /* Adicionado margem para o botão */
       letter-spacing: 0.2px;
       line-height: 1.3;
       overflow: hidden;
@@ -150,10 +170,22 @@ const CardStyles = () => (
   `}</style>
 );
 
-function GameCard({ game, onClick, isSelected }) {
+function GameCard({ game, onClick, isSelected, onNavigate }) {
+  const { isAuthenticated } = useAuth();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const score = game.display_score ? `${Math.round(game.display_score)}%` : null;
   const genres = Array.isArray(game.genres) ? game.genres[0] : game.genres;
+
+  const handleAddToListClick = (e) => {
+    e.stopPropagation(); // Previne que o clique ative o onClick do card
+    if (isAuthenticated) {
+      setShowModal(true);
+    } else {
+      alert('Você precisa estar logado para adicionar à lista.');
+      onNavigate('login');
+    }
+  };
 
   return (
     <>
@@ -215,11 +247,22 @@ function GameCard({ game, onClick, isSelected }) {
 
         <div className="game-card-info">
           <h3 className="game-card-title">{game.name}</h3>
+          <button 
+            className="add-to-list-button" 
+            onClick={handleAddToListClick}
+          >
+            + Adicionar à Lista
+          </button>
         </div>
       </motion.div>
+      <AddToListModal 
+        isOpen={showModal} 
+        onClose={() => setShowModal(false)} 
+        media={{ id: game.id, titulo: game.name, tipo: 'jogo' }} 
+        onNavigate={onNavigate}
+      />
     </>
   );
 }
 
 export default GameCard;
-

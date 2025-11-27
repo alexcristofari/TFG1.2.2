@@ -1,4 +1,4 @@
-// frontend/src/App.js (v8.0 - Com suporte a listas)
+// frontend/src/App.js (v8.1 - Com suporte a listas e ratings)
 import React, { useState } from 'react';
 import './App.css';
 
@@ -13,9 +13,13 @@ import ContactPage from './components/info/ContactPage';
 // Componentes de autenticação
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
+// Componente de Perfil (NOVO)
+import ProfilePage from './components/auth/ProfilePage';
 // Componentes de listas
 import MyListsPage from './components/lists/MyListsPage';
 import ListDetailPage from './components/lists/ListDetailPage';
+// Componentes de ratings (NOVO)
+import MyRatingsPage from './components/ratings/MyRatingsPage';
 
 // Importa os Providers
 import { DataProvider, useData } from './context/DataContext';
@@ -94,21 +98,21 @@ function AppContent() {
         return (
           <>
             {renderBackButton()}
-            <GamesPage />
+            <GamesPage onNavigate={setActiveSystem} />
           </>
         );
       case 'music':
         return (
           <>
             {renderBackButton()}
-            <MusicPage />
+            <MusicPage onNavigate={setActiveSystem} />
           </>
         );
       case 'movies':
         return (
           <>
             {renderBackButton()}
-            <MoviePage />
+            <MoviePage onNavigate={setActiveSystem} />
           </>
         );
       case 'my-lists':
@@ -134,10 +138,24 @@ function AppContent() {
             />
           </>
         );
+      case 'my-ratings': // NOVA ROTA
+        return (
+          <>
+            {renderBackButton()}
+            <MyRatingsPage />
+          </>
+        );
       case 'login':
         return <LoginPage onNavigate={setActiveSystem} />;
       case 'register':
         return <RegisterPage onNavigate={setActiveSystem} />;
+      case 'profile': // NOVA ROTA
+        return (
+          <>
+            {renderBackButton()}
+            <ProfilePage onNavigate={setActiveSystem} />
+          </>
+        );
       case 'home':
       default:
         // Passa as funções para abrir os modais para a HomePage

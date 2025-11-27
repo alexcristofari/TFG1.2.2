@@ -1,5 +1,7 @@
 // frontend/src/components/movies/MovieCard.js (v5.0 - Padrão Ouro Netflix)
 import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import AddToListModal from '../lists/AddToListModal';
 import { motion } from 'framer-motion';
 
 const CardStyles = () => (
@@ -20,6 +22,24 @@ const CardStyles = () => (
     .movie-card-minimal:hover {
       transform: translateY(-4px);
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .add-to-list-button {
+      background-color: #E50914;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      text-align: center;
+    }
+
+    .add-to-list-button:hover {
+      background-color: #b40710;
     }
 
     .movie-card-image-wrapper {
@@ -73,7 +93,7 @@ const CardStyles = () => (
       font-size: 0.9rem;
       font-weight: 600;
       color: #f5f5f5;
-      margin: 0;
+      margin: 0 0 8px 0; /* Adicionado margem para o botão */
       letter-spacing: 0.2px;
       line-height: 1.3;
       overflow: hidden;
@@ -150,10 +170,22 @@ const CardStyles = () => (
   `}</style>
 );
 
-function MovieCard({ movie, onClick, isSelected }) {
+function MovieCard({ movie, onClick, isSelected, onNavigate }) {
+  const { isAuthenticated } = useAuth();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const score = movie.similarity_score ? `${Math.round(movie.similarity_score)}%` : null;
   const genres = movie.genres_list && movie.genres_list.length > 0 ? movie.genres_list[0] : null;
+
+  const handleAddToListClick = (e) => {
+    e.stopPropagation(); // Previne que o clique ative o onClick do card
+    if (isAuthenticated) {
+      setShowModal(true);
+    } else {
+      alert('Você precisa estar logado para adicionar à lista.');
+      onNavigate('login');
+    }
+  };
 
   return (
     <>
@@ -215,8 +247,20 @@ function MovieCard({ movie, onClick, isSelected }) {
 
         <div className="movie-card-info">
           <h3 className="movie-card-title">{movie.title}</h3>
+          <button 
+            className="add-to-list-button" 
+            onClick={handleAddToListClick}
+          >
+            + Adicionar à Lista
+          </button>
         </div>
       </motion.div>
+      <AddToListModal 
+        isOpen={showModal} 
+        onClose={() => setShowModal(false)} 
+        media={{ id: movie.id, titulo: movie.title, tipo: 'filme' }} 
+        onNavigate={onNavigate}
+      />
     </>
   );
 }

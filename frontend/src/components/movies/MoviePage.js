@@ -270,7 +270,7 @@ const LoadingScreen = () => (
   </div>
 );
 
-function MoviePage() {
+function MoviePage({ onNavigate }) {
   const [view, setView] = useState('discover');
   const [recommendationResults, setRecommendationResults] = useState(null);
   const [isRecommendLoading, setIsRecommendLoading] = useState(false);
@@ -481,12 +481,13 @@ function MoviePage() {
             >
               <div className="movies-grid">
                 {(showDiscoverSections ? currentMovies : searchResults).map((movie) => (
-                  <MovieCard
-                    key={movie.id}
-                    movie={movie}
-                    onClick={() => handleCardClick(movie)}
-                    isSelected={isSelected(movie)}
-                  />
+              <MovieCard
+                key={movie.id}
+                movie={movie}
+                onClick={() => handleCardClick(movie)}
+                isSelected={selectedMovies.some((m) => m.id === movie.id)}
+                onNavigate={onNavigate}
+              />
                 ))}
               </div>
 

@@ -37,13 +37,13 @@ const HomeContainer = styled.div`
 `;
 
 // Menu superior direito
-const TopNav = styled.nav`
+  const TopNav = styled.nav`
   position: fixed;
   top: 40px;
   right: 60px;
   z-index: 100;
   display: flex;
-  gap: 40px;
+  gap: 25px; /* Reduzido o gap para acomodar mais links */
   align-items: center;
 `;
 
@@ -94,7 +94,7 @@ const UserInfo = styled.div`
   border-radius: 50px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 15px; /* Aumentado o gap para acomodar mais links */
   
   span {
     font-weight: 600;
@@ -286,7 +286,15 @@ function HomePage({ onSelectSystem, onOpenAbout, onOpenContact }) {
           {/* Mostra info do usuário se logado, senão mostra botão de login */}
           {isAuthenticated ? (
             <UserInfo>
-              <span>👤 {user?.name}</span>
+              <NavLink onClick={() => onSelectSystem('profile')} style={{ color: 'var(--brand-white)', fontWeight: '600' }}>
+                👤 {user?.name}
+              </NavLink>
+              <NavLink onClick={() => onSelectSystem('my-lists')}>
+                Minhas Listas
+              </NavLink>
+              <NavLink onClick={() => onSelectSystem('my-ratings')}>
+                Minhas Avaliações
+              </NavLink>
               <LogoutButton onClick={handleLogout}>sair</LogoutButton>
             </UserInfo>
           ) : (

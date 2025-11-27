@@ -270,7 +270,7 @@ const LoadingScreen = () => (
   </div>
 );
 
-function GamesPage() {
+function GamesPage({ onNavigate }) {
   const [view, setView] = useState('discover');
   const [recommendationResults, setRecommendationResults] = useState(null);
   const [isRecommendLoading, setIsRecommendLoading] = useState(false);
@@ -486,12 +486,13 @@ function GamesPage() {
             >
               <div className="games-grid">
                 {(showDiscoverSections ? currentGames : searchResults).map((game) => (
-                  <GameCard
-                    key={game.appid}
-                    game={game}
-                    onClick={() => handleCardClick(game)}
-                    isSelected={isSelected(game)}
-                  />
+              <GameCard
+                key={game.appid}
+                game={game}
+                onClick={() => handleCardClick(game)}
+                isSelected={selectedGames.some((g) => g.appid === game.appid)}
+                onNavigate={onNavigate}
+              />
                 ))}
               </div>
 
@@ -525,4 +526,3 @@ function GamesPage() {
 }
 
 export default GamesPage;
-
