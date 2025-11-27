@@ -27,8 +27,8 @@ export function DataProvider({ children }) {
         { key: 'moviesGenres', url: '/api/movies/genres' },
       ];
 
-      console.log(\"--- INICIANDO DEPURACAO DE REDE (FRONTEND) ---\");
-      console.log(\"Tentando buscar as seguintes URLs:\", urlsToFetch.map(u => u.url));
+      console.log("--- INICIANDO DEPURACAO DE REDE (FRONTEND) ---");
+      console.log("Tentando buscar as seguintes URLs:", urlsToFetch.map(u => u.url));
       
       try {
         const promises = urlsToFetch.map(item => {
@@ -38,7 +38,7 @@ export function DataProvider({ children }) {
 
         setLoadingStatus('Aquecendo sistemas...');
         const responses = await Promise.all(promises);
-        console.log(\"[FRONTEND] Todas as promises foram resolvidas com sucesso!\");
+        console.log("[FRONTEND] Todas as promises foram resolvidas com sucesso!");
 
         // Mapeia as respostas de volta para os dados
         const dataMap = responses.reduce((acc, response, index) => {
@@ -67,11 +67,11 @@ export function DataProvider({ children }) {
         setIsLoading(false);
 
       } catch (error) {
-        console.error(\"--- FALHA CRÍTICA NA REDE (FRONTEND) ---\", error);
+        console.error("--- FALHA CRÍTICA NA REDE (FRONTEND) ---", error);
         // --- MODO DEPURACAO: Mostra a URL exata que falhou ---
         if (error.response) {
           const failedUrl = error.config.url;
-          console.error(`[FRONTEND] A URL que falhou foi: http://localhost:5000${failedUrl}` );
+          console.error(`[FRONTEND] A URL que falhou foi: http://localhost:5000${failedUrl}`);
           console.error(`[FRONTEND] Status da falha: ${error.response.status}`);
           setLoadingStatus(`Erro ${error.response.status} ao buscar ${failedUrl}. Verifique os terminais.`);
         } else {
@@ -105,7 +105,7 @@ export function DataProvider({ children }) {
       const response = await axios.post('/api/listas', listData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      await loadLists(token); // Recarrega as listas
+      await loadLists(token);
       return response.data;
     } catch (error) {
       console.error('[DataContext] Erro ao criar lista:', error);
@@ -132,7 +132,7 @@ export function DataProvider({ children }) {
       const response = await axios.put(`/api/listas/${listId}`, listData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      await loadLists(token); // Recarrega as listas
+      await loadLists(token);
       return response.data;
     } catch (error) {
       console.error('[DataContext] Erro ao atualizar lista:', error);
@@ -146,7 +146,7 @@ export function DataProvider({ children }) {
       await axios.delete(`/api/listas/${listId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      await loadLists(token); // Recarrega as listas
+      await loadLists(token);
     } catch (error) {
       console.error('[DataContext] Erro ao deletar lista:', error);
       throw error;
@@ -161,7 +161,7 @@ export function DataProvider({ children }) {
         { midia_id: midiaId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      await loadLists(token); // Recarrega as listas
+      await loadLists(token);
       return response.data;
     } catch (error) {
       console.error('[DataContext] Erro ao adicionar mídia à lista:', error);
@@ -175,7 +175,7 @@ export function DataProvider({ children }) {
       await axios.delete(`/api/listas/${listId}/itens/${itemId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      await loadLists(token); // Recarrega as listas
+      await loadLists(token);
     } catch (error) {
       console.error('[DataContext] Erro ao remover mídia da lista:', error);
       throw error;
