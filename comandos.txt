@@ -56,6 +56,12 @@ npm start
  # 8. Mensagem final para você saber que terminou
  echo "Processo concluído. Verifique seu repositório no GitHub."
 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+git add .
+git commit -m "Atualização do projeto"
+
+git push origin main
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
  USE RecomendadorMultimidia;
@@ -77,3 +83,79 @@ SELECT TOP 10 m.*, md.*
 FROM midias m 
 JOIN midia_detalhes md ON m.id = md.midia_id 
 WHERE m.tipo = 'jogo';
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- ============================================
+-- 1️⃣ PRIMEIROS 10 JOGOS COM DETALHES
+-- ============================================
+SELECT TOP 10
+    m.id,
+    m.titulo,
+    m.genero,
+    m.ano_lancamento,
+    LEFT(m.descricao, 50) as descricao_resumo,
+    jd.desenvolvedor,
+    jd.publisher,
+    jd.plataforma
+FROM midias m
+INNER JOIN jogo_detalhes jd ON m.id = jd.midia_id
+WHERE m.tipo = 'jogo'
+ORDER BY m.id;
+
+-- ============================================
+-- 2️⃣ PRIMEIRAS 10 MÚSICAS COM DETALHES
+-- ============================================
+SELECT TOP 10
+    m.id,
+    m.titulo,
+    m.genero,
+    md.artista,
+    md.album,
+    md.duracao_ms,
+    md.popularity,
+    md.danceability,
+    md.energy
+FROM midias m
+INNER JOIN musica_detalhes md ON m.id = md.midia_id
+WHERE m.tipo = 'musica'
+ORDER BY m.id;
+
+-- ============================================
+-- 3️⃣ PRIMEIROS 10 FILMES COM DETALHES
+-- ============================================
+SELECT TOP 10
+    m.id,
+    m.titulo,
+    m.genero,
+    m.ano_lancamento,
+    fd.vote_average,
+    fd.vote_count,
+    fd.runtime,
+    fd.imdb_id,
+    LEFT(fd.poster_path, 40) as poster
+FROM midias m
+INNER JOIN filme_detalhes fd ON m.id = fd.midia_id
+WHERE m.tipo = 'filme'
+ORDER BY m.id;
+
+-- ============================================
+-- 4️⃣ RESUMO GERAL (CONTAGEM)
+-- ============================================
+SELECT 
+    'midias' as tabela,
+    tipo,
+    COUNT(*) as total
+FROM midias
+GROUP BY tipo
+
+UNION ALL
+
+SELECT 'jogo_detalhes', 'jogo', COUNT(*) FROM jogo_detalhes
+UNION ALL
+SELECT 'musica_detalhes', 'musica', COUNT(*) FROM musica_detalhes
+UNION ALL
+SELECT 'filme_detalhes', 'filme', COUNT(*) FROM filme_detalhes
+
+ORDER BY tabela, tipo;

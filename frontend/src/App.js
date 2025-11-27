@@ -1,4 +1,4 @@
-// frontend/src/App.js (v7.0 - Com AuthContext)
+// frontend/src/App.js (v8.0 - Com suporte a listas)
 import React, { useState } from 'react';
 import './App.css';
 
@@ -13,6 +13,9 @@ import ContactPage from './components/info/ContactPage';
 // Componentes de autenticação
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
+// Componentes de listas
+import MyListsPage from './components/lists/MyListsPage';
+import ListDetailPage from './components/lists/ListDetailPage';
 
 // Importa os Providers
 import { DataProvider, useData } from './context/DataContext';
@@ -21,6 +24,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 // Componente interno para ter acesso ao contexto
 function AppContent() {
   const [activeSystem, setActiveSystem] = useState('home');
+  const [selectedListaId, setSelectedListaId] = useState(null);
   // Estados para controlar a visibilidade dos modais
   const [showAbout, setShowAbout] = useState(false);
   const [showContact, setShowContact] = useState(false);
@@ -105,6 +109,29 @@ function AppContent() {
           <>
             {renderBackButton()}
             <MoviePage />
+          </>
+        );
+      case 'my-lists':
+        return (
+          <>
+            {renderBackButton()}
+            <MyListsPage 
+              onNavigate={setActiveSystem}
+              onSelectList={(listaId) => {
+                setSelectedListaId(listaId);
+                setActiveSystem('list-detail');
+              }}
+            />
+          </>
+        );
+      case 'list-detail':
+        return (
+          <>
+            {renderBackButton()}
+            <ListDetailPage 
+              listaId={selectedListaId}
+              onNavigate={setActiveSystem}
+            />
           </>
         );
       case 'login':
