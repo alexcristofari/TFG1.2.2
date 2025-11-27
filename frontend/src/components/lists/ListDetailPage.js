@@ -1,138 +1,236 @@
-// frontend/src/components/lists/ListDetailPage.js
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const API_URL = 'http://localhost:5000';
+import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-  padding: 80px 40px 40px;
-  color: #f5f5f5;
-  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+  padding: 80px 20px 40px;
+`;
+
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
 `;
 
 const Header = styled.div`
-  max-width: 1200px;
-  margin: 0 auto 40px;
-`;
-
-const TitleRow = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  gap: 20px;
+  flex-wrap: wrap;
+`;
+
+const TitleSection = styled.div`
+  flex: 1;
+  min-width: 300px;
+`;
+
+const BackButton = styled(motion.button)`
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(-5px);
+  }
 `;
 
 const Title = styled.h1`
-  font-size: 2.5rem;
+  color: #fff;
+  font-size: 42px;
   font-weight: 700;
-  color: #0d7a3f;
+  margin: 0 0 10px 0;
+  background: linear-gradient(135deg, #fff 0%, #9333ea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 `;
 
-const ButtonGroup = styled.div`
+const Description = styled.p`
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+`;
+
+const Actions = styled.div`
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 `;
 
-const Button = styled.button`
-  padding: 10px 20px;
-  border-radius: 8px;
+const ActionButton = styled(motion.button)`
+  background: ${props => props.danger ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)'};
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: none;
-  
-  ${props => props.variant === 'primary' ? `
-    background: #0d7a3f;
-    color: white;
-    &:hover { background: #0f8f4a; }
-  ` : props.variant === 'danger' ? `
-    background: #8b0000;
-    color: white;
-    &:hover { background: #a00000; }
-  ` : `
-    background: rgba(255, 255, 255, 0.1);
-    color: #f5f5f5;
-    &:hover { background: rgba(255, 255, 255, 0.15); }
-  `}
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${props => props.danger ? '0 10px 30px rgba(239, 68, 68, 0.3)' : '0 10px 30px rgba(147, 51, 234, 0.3)'};
+  }
 `;
 
-const Description = styled.p`
-  font-size: 1rem;
-  color: #a0a0a0;
-  line-height: 1.6;
+const Stats = styled.div`
+  display: flex;
+  gap: 30px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+`;
+
+const StatItem = styled.div`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px 30px;
+  text-align: center;
+`;
+
+const StatValue = styled.div`
+  color: #9333ea;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 5px;
+`;
+
+const StatLabel = styled.div`
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 `;
 
 const MediaGrid = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
 `;
 
 const MediaCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, rgba(30, 30, 46, 0.8) 0%, rgba(42, 42, 62, 0.8) 100%);
+  border-radius: 20px;
+  padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  
+
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(13, 122, 63, 0.5);
-    transform: translateY(-4px);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(147, 51, 234, 0.3);
+    border-color: #9333ea;
   }
 `;
 
 const MediaImage = styled.div`
   width: 100%;
   height: 180px;
-  background: ${props => props.src ? `url(${props.src})` : '#2a2a3e'} center/cover;
+  background: ${props => props.src ? `url(${props.src})` : 'linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%)'};
   background-size: cover;
   background-position: center;
-`;
-
-const MediaInfo = styled.div`
-  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 48px;
 `;
 
 const MediaTitle = styled.h3`
-  font-size: 1.1rem;
+  color: #fff;
+  font-size: 18px;
   font-weight: 600;
-  margin-bottom: 8px;
-  color: #f5f5f5;
-  white-space: nowrap;
+  margin: 0 0 8px 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
-const MediaMeta = styled.div`
-  font-size: 0.85rem;
-  color: #888;
+const MediaType = styled.div`
+  color: #9333ea;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   margin-bottom: 12px;
 `;
 
-const RemoveButton = styled.button`
+const RemoveButton = styled(motion.button)`
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
   width: 100%;
-  padding: 8px;
-  background: rgba(139, 0, 0, 0.2);
-  border: 1px solid rgba(139, 0, 0, 0.4);
-  border-radius: 6px;
-  color: #ff6b6b;
-  font-size: 0.85rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: scale(1.02);
+  }
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 80px 20px;
+`;
+
+const EmptyIcon = styled.div`
+  font-size: 80px;
+  margin-bottom: 20px;
+  opacity: 0.3;
+`;
+
+const EmptyText = styled.p`
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
+  margin: 0 0 30px 0;
+`;
+
+const EmptyButton = styled(motion.button)`
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 32px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover {
-    background: rgba(139, 0, 0, 0.4);
-    color: #ff4444;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(147, 51, 234, 0.3);
   }
+`;
+
+const Loading = styled.div`
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
 `;
 
 const Modal = styled(motion.div)`
@@ -143,257 +241,247 @@ const Modal = styled(motion.div)`
   bottom: 0;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
   padding: 20px;
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #1a1a2e;
-  border-radius: 16px;
-  padding: 32px;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+  border-radius: 20px;
+  padding: 30px;
   max-width: 500px;
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const ModalTitle = styled.h2`
-  font-size: 1.8rem;
-  margin-bottom: 24px;
-  color: #0d7a3f;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 12px;
-  margin-bottom: 16px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #f5f5f5;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-  
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+
   &:focus {
     outline: none;
-    border-color: #0d7a3f;
+    border-color: #9333ea;
+    background: rgba(255, 255, 255, 0.08);
   }
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
-  padding: 12px;
-  margin-bottom: 16px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #f5f5f5;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-  resize: vertical;
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 20px;
   min-height: 100px;
-  
+  resize: vertical;
+  font-family: inherit;
+  transition: all 0.3s ease;
+
   &:focus {
     outline: none;
-    border-color: #0d7a3f;
+    border-color: #9333ea;
+    background: rgba(255, 255, 255, 0.08);
   }
 `;
 
-const ModalButtonGroup = styled.div`
+const ModalActions = styled.div`
   display: flex;
   gap: 12px;
-  justify-content: flex-end;
 `;
 
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 80px 20px;
-  color: #a0a0a0;
-  
-  h3 {
-    font-size: 1.5rem;
-    margin-bottom: 12px;
-    color: #666;
+const ModalButton = styled(motion.button)`
+  flex: 1;
+  background: ${props => props.primary ? 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)' : 'rgba(255, 255, 255, 0.1)'};
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
   }
 `;
 
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 80px 20px;
-  color: #0d7a3f;
-  font-size: 1.2rem;
-`;
+const ListDetailPage = ({ listaId, onNavigate }) => {
+  const { getListDetails, updateList, deleteList, removeMediaFromList } = useData();
+  const { token } = useAuth();
 
-function ListDetailPage({ listaId, onNavigate }) {
-  const { token, isAuthenticated } = useAuth();
-  const [lista, setLista] = useState(null);
+  const [list, setList] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [editData, setEditData] = useState({ nome: '', descricao: '' });
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      onNavigate('login');
-      return;
-    }
-    fetchListaDetalhes();
+    loadListDetails();
   }, [listaId]);
 
-  const fetchListaDetalhes = async () => {
+  const loadListDetails = async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/listas/${listaId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setLista(data.lista);
-        setEditData({ nome: data.lista.nome, descricao: data.lista.descricao });
-      }
+      const data = await getListDetails(listaId, token);
+      setList(data);
+      setEditName(data.nome);
+      setEditDescription(data.descricao || '');
     } catch (error) {
-      console.error('Erro ao buscar lista:', error);
+      console.error('Erro ao carregar detalhes da lista:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const removerItem = async (itemId) => {
-    try {
-      const response = await fetch(`${API_URL}/api/listas/${listaId}/itens/${itemId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+  const handleEdit = () => {
+    setShowEditModal(true);
+  };
 
-      const data = await response.json();
-      
-      if (data.success) {
-        fetchListaDetalhes();
-      }
+  const handleSaveEdit = async () => {
+    try {
+      await updateList(listaId, { nome: editName, descricao: editDescription }, token);
+      setShowEditModal(false);
+      loadListDetails();
     } catch (error) {
-      console.error('Erro ao remover item:', error);
+      console.error('Erro ao atualizar lista:', error);
     }
   };
 
-  const editarLista = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/listas/${listaId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(editData)
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setShowEditModal(false);
-        fetchListaDetalhes();
-      }
-    } catch (error) {
-      console.error('Erro ao editar lista:', error);
-    }
-  };
-
-  const deletarLista = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/listas/${listaId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
+  const handleDelete = async () => {
+    if (window.confirm('Tem certeza que deseja excluir esta lista?')) {
+      try {
+        await deleteList(listaId, token);
         onNavigate('my-lists');
+      } catch (error) {
+        console.error('Erro ao deletar lista:', error);
       }
-    } catch (error) {
-      console.error('Erro ao deletar lista:', error);
+    }
+  };
+
+  const handleRemoveMedia = async (itemId) => {
+    if (window.confirm('Remover esta mídia da lista?')) {
+      try {
+        await removeMediaFromList(listaId, itemId, token);
+        loadListDetails();
+      } catch (error) {
+        console.error('Erro ao remover mídia:', error);
+      }
     }
   };
 
   if (loading) {
     return (
       <PageContainer>
-        <LoadingState>Carregando detalhes...</LoadingState>
+        <Container>
+          <Loading>Carregando...</Loading>
+        </Container>
       </PageContainer>
     );
   }
 
-  if (!lista) {
+  if (!list) {
     return (
       <PageContainer>
-        <EmptyState>
-          <h3>Lista não encontrada</h3>
-        </EmptyState>
+        <Container>
+          <EmptyState>
+            <EmptyIcon>📋</EmptyIcon>
+            <EmptyText>Lista não encontrada</EmptyText>
+            <EmptyButton onClick={() => onNavigate('my-lists')}>
+              Voltar para Minhas Listas
+            </EmptyButton>
+          </EmptyState>
+        </Container>
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <Header>
-        <TitleRow>
-          <Title>{lista.nome}</Title>
-          <ButtonGroup>
-            <Button variant="secondary" onClick={() => onNavigate('my-lists')}>
-              ← Voltar
-            </Button>
-            <Button variant="primary" onClick={() => setShowEditModal(true)}>
+      <Container>
+        <BackButton onClick={() => onNavigate('my-lists')} whileTap={{ scale: 0.95 }}>
+          ← Voltar
+        </BackButton>
+
+        <Header>
+          <TitleSection>
+            <Title>{list.nome}</Title>
+            {list.descricao && <Description>{list.descricao}</Description>}
+          </TitleSection>
+
+          <Actions>
+            <ActionButton onClick={handleEdit} whileTap={{ scale: 0.95 }}>
               ✏️ Editar
-            </Button>
-            <Button variant="danger" onClick={() => setShowDeleteModal(true)}>
-              🗑️ Deletar
-            </Button>
-          </ButtonGroup>
-        </TitleRow>
-        {lista.descricao && <Description>{lista.descricao}</Description>}
-        <Description style={{ marginTop: '8px', fontSize: '0.9rem', color: '#666' }}>
-          {lista.itens.length} {lista.itens.length === 1 ? 'item' : 'itens'} • 
-          Criada em {new Date(lista.data_criacao).toLocaleDateString('pt-BR')}
-        </Description>
-      </Header>
+            </ActionButton>
+            <ActionButton danger onClick={handleDelete} whileTap={{ scale: 0.95 }}>
+              🗑️ Excluir
+            </ActionButton>
+          </Actions>
+        </Header>
 
-      {lista.itens.length === 0 ? (
-        <EmptyState>
-          <h3>Lista vazia</h3>
-          <p>Adicione mídias a esta lista navegando pelos jogos, músicas ou filmes!</p>
-        </EmptyState>
-      ) : (
-        <MediaGrid>
-          {lista.itens.map((item) => (
-            <MediaCard
-              key={item.item_id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <MediaImage src={item.imagem} />
-              <MediaInfo>
-                <MediaTitle>{item.titulo}</MediaTitle>
-                <MediaMeta>
-                  {item.tipo} • {item.genero} • {item.ano}
-                </MediaMeta>
-                <RemoveButton onClick={() => removerItem(item.item_id)}>
-                  Remover da lista
+        <Stats>
+          <StatItem>
+            <StatValue>{list.itens?.length || 0}</StatValue>
+            <StatLabel>Mídias</StatLabel>
+          </StatItem>
+          <StatItem>
+            <StatValue>{new Date(list.criado_em).toLocaleDateString('pt-BR')}</StatValue>
+            <StatLabel>Criado em</StatLabel>
+          </StatItem>
+        </Stats>
+
+        {list.itens && list.itens.length > 0 ? (
+          <MediaGrid>
+            {list.itens.map((item) => (
+              <MediaCard
+                key={item.item_id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <MediaImage src={item.imagem_url}>
+                  {!item.imagem_url && '🎬'}
+                </MediaImage>
+                <MediaTitle>{item.titulo || item.nome}</MediaTitle>
+                <MediaType>{item.tipo}</MediaType>
+                <RemoveButton
+                  onClick={() => handleRemoveMedia(item.item_id)}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Remover
                 </RemoveButton>
-              </MediaInfo>
-            </MediaCard>
-          ))}
-        </MediaGrid>
-      )}
+              </MediaCard>
+            ))}
+          </MediaGrid>
+        ) : (
+          <EmptyState>
+            <EmptyIcon>📭</EmptyIcon>
+            <EmptyText>Esta lista está vazia</EmptyText>
+            <EmptyButton onClick={() => onNavigate('home')} whileTap={{ scale: 0.95 }}>
+              Adicionar Mídias
+            </EmptyButton>
+          </EmptyState>
+        )}
+      </Container>
 
-      {/* Modal de Edição */}
       <AnimatePresence>
         {showEditModal && (
           <Modal
@@ -403,75 +491,37 @@ function ListDetailPage({ listaId, onNavigate }) {
             onClick={() => setShowEditModal(false)}
           >
             <ModalContent
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
               <ModalTitle>Editar Lista</ModalTitle>
-              
               <Input
                 type="text"
                 placeholder="Nome da lista"
-                value={editData.nome}
-                onChange={(e) => setEditData({ ...editData, nome: e.target.value })}
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
               />
-              
               <TextArea
                 placeholder="Descrição (opcional)"
-                value={editData.descricao}
-                onChange={(e) => setEditData({ ...editData, descricao: e.target.value })}
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
               />
-              
-              <ModalButtonGroup>
-                <Button onClick={() => setShowEditModal(false)}>
+              <ModalActions>
+                <ModalButton onClick={() => setShowEditModal(false)}>
                   Cancelar
-                </Button>
-                <Button variant="primary" onClick={editarLista}>
-                  Salvar Alterações
-                </Button>
-              </ModalButtonGroup>
-            </ModalContent>
-          </Modal>
-        )}
-      </AnimatePresence>
-
-      {/* Modal de Confirmação de Delete */}
-      <AnimatePresence>
-        {showDeleteModal && (
-          <Modal
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowDeleteModal(false)}
-          >
-            <ModalContent
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ModalTitle>Confirmar Exclusão</ModalTitle>
-              
-              <p style={{ marginBottom: '24px', color: '#a0a0a0' }}>
-                Tem certeza que deseja deletar a lista <strong>{lista.nome}</strong>? 
-                Esta ação não pode ser desfeita.
-              </p>
-              
-              <ModalButtonGroup>
-                <Button onClick={() => setShowDeleteModal(false)}>
-                  Cancelar
-                </Button>
-                <Button variant="danger" onClick={deletarLista}>
-                  Sim, Deletar
-                </Button>
-              </ModalButtonGroup>
+                </ModalButton>
+                <ModalButton primary onClick={handleSaveEdit} whileTap={{ scale: 0.95 }}>
+                  Salvar
+                </ModalButton>
+              </ModalActions>
             </ModalContent>
           </Modal>
         )}
       </AnimatePresence>
     </PageContainer>
   );
-}
+};
 
 export default ListDetailPage;

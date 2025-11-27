@@ -1,267 +1,329 @@
-// frontend/src/components/lists/AddToListModal.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 
-const API_URL = 'http://localhost:5000';
-
-const Modal = styled(motion.div)`
+const ModalOverlay = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
   padding: 20px;
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #1a1a2e;
-  border-radius: 16px;
-  padding: 32px;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+  border-radius: 20px;
+  padding: 30px;
   max-width: 500px;
   width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(147, 51, 234, 0.5);
+    border-radius: 10px;
+
+    &:hover {
+      background: rgba(147, 51, 234, 0.7);
+    }
+  }
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
 `;
 
 const ModalTitle = styled.h2`
-  font-size: 1.8rem;
-  margin-bottom: 8px;
-  color: #0d7a3f;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
 `;
 
-const MediaTitle = styled.p`
-  font-size: 1rem;
-  color: #a0a0a0;
-  margin-bottom: 24px;
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #f5f5f5;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 28px;
   cursor: pointer;
-  
-  &:focus {
-    outline: none;
-    border-color: #0d7a3f;
-  }
-  
-  option {
-    background: #1a1a2e;
-    color: #f5f5f5;
-  }
-`;
-
-const ButtonGroup = styled.div`
+  padding: 0;
+  width: 32px;
+  height: 32px;
   display: flex;
-  gap: 12px;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(90deg);
+  }
 `;
 
-const Button = styled.button`
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
+const MediaInfo = styled.div`
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
+const MediaTitle = styled.h3`
+  color: #fff;
+  font-size: 18px;
   font-weight: 600;
+  margin: 0 0 5px 0;
+`;
+
+const MediaType = styled.span`
+  color: #9333ea;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+`;
+
+const ListsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
+`;
+
+const ListItem = styled(motion.button)`
+  background: ${props => props.selected ? 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)' : 'rgba(255, 255, 255, 0.05)'};
+  border: 2px solid ${props => props.selected ? '#9333ea' : 'rgba(255, 255, 255, 0.1)'};
+  border-radius: 12px;
+  padding: 15px 20px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: none;
-  
-  ${props => props.primary ? `
-    background: #0d7a3f;
-    color: white;
-    &:hover { background: #0f8f4a; }
-  ` : `
-    background: rgba(255, 255, 255, 0.1);
-    color: #f5f5f5;
-    &:hover { background: rgba(255, 255, 255, 0.15); }
-  `}
-  
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &:hover {
+    background: ${props => props.selected ? 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)' : 'rgba(255, 255, 255, 0.1)'};
+    transform: translateX(5px);
+  }
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 `;
 
-const Message = styled.div`
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-size: 0.9rem;
-  
-  ${props => props.type === 'success' ? `
-    background: rgba(13, 122, 63, 0.2);
-    border: 1px solid rgba(13, 122, 63, 0.4);
-    color: #4ade80;
-  ` : props.type === 'error' ? `
-    background: rgba(139, 0, 0, 0.2);
-    border: 1px solid rgba(139, 0, 0, 0.4);
-    color: #ff6b6b;
-  ` : ''}
+const CheckIcon = styled.span`
+  font-size: 20px;
 `;
 
-const CreateListButton = styled.button`
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 16px;
-  background: rgba(13, 122, 63, 0.2);
-  border: 1px solid rgba(13, 122, 63, 0.4);
-  border-radius: 8px;
-  color: #0d7a3f;
-  font-size: 0.9rem;
+const EmptyMessage = styled.div`
+  text-align: center;
+  padding: 30px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+`;
+
+const CreateListButton = styled(motion.button)`
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  width: 100%;
+  margin-bottom: 20px;
   transition: all 0.3s ease;
-  
+
   &:hover {
-    background: rgba(13, 122, 63, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
   }
 `;
 
-function AddToListModal({ isOpen, onClose, midiaId, tituloMidia }) {
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 12px;
+`;
+
+const Button = styled(motion.button)`
+  flex: 1;
+  background: ${props => props.primary ? 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)' : 'rgba(255, 255, 255, 0.1)'};
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${props => props.primary ? '0 10px 30px rgba(147, 51, 234, 0.3)' : '0 5px 15px rgba(255, 255, 255, 0.1)'};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+`;
+
+const Message = styled(motion.div)`
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  text-align: center;
+  background: ${props => props.type === 'success' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+  color: ${props => props.type === 'success' ? '#10b981' : '#ef4444'};
+  border: 1px solid ${props => props.type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'};
+`;
+
+const AddToListModal = ({ isOpen, onClose, media, onNavigate }) => {
+  const { lists, addMediaToList } = useData();
   const { token } = useAuth();
-  const [listas, setListas] = useState([]);
-  const [selectedListaId, setSelectedListaId] = useState('');
+  const [selectedListId, setSelectedListId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
+  const [message, setMessage] = useState(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchListas();
-      setMessage({ type: '', text: '' });
-    }
-  }, [isOpen]);
+  const handleAddToList = async () => {
+    if (!selectedListId) return;
 
-  const fetchListas = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/listas`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setListas(data.listas);
-        if (data.listas.length > 0) {
-          setSelectedListaId(data.listas[0].id);
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao buscar listas:', error);
-    }
-  };
-
-  const adicionarMidia = async () => {
-    if (!selectedListaId) return;
-    
     setLoading(true);
-    setMessage({ type: '', text: '' });
+    setMessage(null);
 
     try {
-      const response = await fetch(`${API_URL}/api/listas/${selectedListaId}/itens`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ midia_id: midiaId })
-      });
-
-      const data = await response.json();
+      await addMediaToList(selectedListId, media.id, token);
+      setMessage({ type: 'success', text: 'Mídia adicionada com sucesso!' });
       
-      if (data.success) {
-        setMessage({ type: 'success', text: 'Mídia adicionada com sucesso!' });
-        setTimeout(() => onClose(), 1500);
-      } else {
-        setMessage({ type: 'error', text: data.error || 'Erro ao adicionar mídia' });
-      }
+      setTimeout(() => {
+        onClose();
+        setSelectedListId(null);
+        setMessage(null);
+      }, 1500);
     } catch (error) {
-      console.error('Erro ao adicionar mídia:', error);
-      setMessage({ type: 'error', text: 'Erro ao adicionar mídia à lista' });
+      setMessage({ type: 'error', text: error.message || 'Erro ao adicionar mídia' });
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !media) return null;
 
   return (
     <AnimatePresence>
-      <Modal
+      <ModalOverlay
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       >
         <ModalContent
-          initial={{ scale: 0.9, opacity: 0 }}
+          initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
+          exit={{ scale: 0.8, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <ModalTitle>Adicionar à Lista</ModalTitle>
-          <MediaTitle>"{tituloMidia}"</MediaTitle>
+          <ModalHeader>
+            <ModalTitle>Adicionar à Lista</ModalTitle>
+            <CloseButton onClick={onClose}>×</CloseButton>
+          </ModalHeader>
 
-          {message.text && (
-            <Message type={message.type}>
+          <MediaInfo>
+            <MediaTitle>{media.titulo || media.nome}</MediaTitle>
+            <MediaType>{media.tipo}</MediaType>
+          </MediaInfo>
+
+          {message && (
+            <Message
+              type={message.type}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
               {message.text}
             </Message>
           )}
 
-          {listas.length === 0 ? (
+          {lists && lists.length > 0 ? (
             <>
-              <p style={{ color: '#a0a0a0', marginBottom: '16px' }}>
-                Você ainda não tem listas. Crie uma para começar!
-              </p>
-              <CreateListButton onClick={() => {
-                onClose();
-                // Navegação para criar lista (implementar conforme necessário)
-              }}>
-                + Criar Nova Lista
-              </CreateListButton>
-            </>
-          ) : (
-            <>
-              <Select
-                value={selectedListaId}
-                onChange={(e) => setSelectedListaId(e.target.value)}
-                disabled={loading}
-              >
-                {listas.map((lista) => (
-                  <option key={lista.id} value={lista.id}>
-                    {lista.nome} ({lista.total_itens} {lista.total_itens === 1 ? 'item' : 'itens'})
-                  </option>
+              <ListsContainer>
+                {lists.map((list) => (
+                  <ListItem
+                    key={list.id}
+                    selected={selectedListId === list.id}
+                    onClick={() => setSelectedListId(list.id)}
+                    whileTap={{ scale: 0.98 }}
+                    disabled={loading}
+                  >
+                    <span>{list.nome}</span>
+                    {selectedListId === list.id && <CheckIcon>✓</CheckIcon>}
+                  </ListItem>
                 ))}
-              </Select>
+              </ListsContainer>
 
               <ButtonGroup>
                 <Button onClick={onClose} disabled={loading}>
                   Cancelar
                 </Button>
-                <Button primary onClick={adicionarMidia} disabled={loading || !selectedListaId}>
+                <Button
+                  primary
+                  onClick={handleAddToList}
+                  disabled={!selectedListId || loading}
+                  whileTap={{ scale: 0.95 }}
+                >
                   {loading ? 'Adicionando...' : 'Adicionar'}
                 </Button>
               </ButtonGroup>
             </>
+          ) : (
+            <>
+              <EmptyMessage>
+                Você ainda não tem listas. Crie uma para começar!
+              </EmptyMessage>
+              <CreateListButton
+                onClick={() => {
+                  onClose();
+                  onNavigate('my-lists');
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                + Criar Nova Lista
+              </CreateListButton>
+            </>
           )}
         </ModalContent>
-      </Modal>
+      </ModalOverlay>
     </AnimatePresence>
   );
-}
+};
 
 export default AddToListModal;

@@ -1,94 +1,150 @@
-// frontend/src/components/lists/MyListsPage.js
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 
-const API_URL = 'http://localhost:5000';
-
-// Estilos
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-  padding: 80px 40px 40px;
-  color: #f5f5f5;
-  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+  padding: 80px 20px 40px;
+`;
+
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
 `;
 
 const Header = styled.div`
-  max-width: 1200px;
-  margin: 0 auto 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 50px;
+  flex-wrap: wrap;
+  gap: 20px;
 `;
 
 const Title = styled.h1`
-  font-size: 2.5rem;
+  color: #fff;
+  font-size: 48px;
   font-weight: 700;
-  color: #0d7a3f;
+  margin: 0;
+  background: linear-gradient(135deg, #fff 0%, #9333ea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 `;
 
-const CreateButton = styled.button`
-  background: #0d7a3f;
+const CreateButton = styled(motion.button)`
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 15px;
+  padding: 14px 32px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   transition: all 0.3s ease;
-  
+
   &:hover {
-    background: #0f8f4a;
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(13, 122, 63, 0.3);
+    box-shadow: 0 15px 40px rgba(147, 51, 234, 0.4);
   }
 `;
 
 const ListsGrid = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
 `;
 
 const ListCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, rgba(30, 30, 46, 0.8) 0%, rgba(42, 42, 62, 0.8) 100%);
+  border-radius: 20px;
+  padding: 30px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 24px;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
   transition: all 0.3s ease;
-  
+
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(13, 122, 63, 0.5);
-    transform: translateY(-4px);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(147, 51, 234, 0.3);
+    border-color: #9333ea;
   }
 `;
 
+const ListIcon = styled.div`
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 20px;
+`;
+
 const ListTitle = styled.h3`
-  font-size: 1.3rem;
+  color: #fff;
+  font-size: 22px;
   font-weight: 600;
-  margin-bottom: 8px;
-  color: #f5f5f5;
+  margin: 0 0 10px 0;
 `;
 
 const ListDescription = styled.p`
-  font-size: 0.9rem;
-  color: #a0a0a0;
-  margin-bottom: 16px;
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  min-height: 40px;
 `;
 
-const ListInfo = styled.div`
+const ListStats = styled.div`
   display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: #666;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const StatItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+`;
+
+const StatValue = styled.span`
+  color: #9333ea;
+  font-size: 20px;
+  font-weight: 700;
+`;
+
+const StatLabel = styled.span`
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 100px 20px;
+`;
+
+const EmptyIcon = styled.div`
+  font-size: 100px;
+  margin-bottom: 30px;
+  opacity: 0.3;
+`;
+
+const EmptyText = styled.p`
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 20px;
+  margin: 0 0 40px 0;
 `;
 
 const Modal = styled(motion.div)`
@@ -99,263 +155,278 @@ const Modal = styled(motion.div)`
   bottom: 0;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
   padding: 20px;
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #1a1a2e;
-  border-radius: 16px;
-  padding: 32px;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+  border-radius: 20px;
+  padding: 40px;
   max-width: 500px;
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const ModalTitle = styled.h2`
-  font-size: 1.8rem;
-  margin-bottom: 24px;
-  color: #0d7a3f;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 30px 0;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 12px;
-  margin-bottom: 16px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #f5f5f5;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-  
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+
   &:focus {
     outline: none;
-    border-color: #0d7a3f;
+    border-color: #9333ea;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.3);
   }
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
-  padding: 12px;
-  margin-bottom: 16px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #f5f5f5;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 30px;
+  min-height: 120px;
   resize: vertical;
-  min-height: 100px;
-  
+  font-family: inherit;
+  transition: all 0.3s ease;
+
   &:focus {
     outline: none;
-    border-color: #0d7a3f;
+    border-color: #9333ea;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.3);
   }
 `;
 
-const ButtonGroup = styled.div`
+const ModalActions = styled.div`
   display: flex;
-  gap: 12px;
-  justify-content: flex-end;
+  gap: 15px;
 `;
 
-const Button = styled.button`
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
+const ModalButton = styled(motion.button)`
+  flex: 1;
+  background: ${props => props.primary ? 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)' : 'rgba(255, 255, 255, 0.1)'};
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: none;
-  
-  ${props => props.primary ? `
-    background: #0d7a3f;
-    color: white;
-    &:hover {
-      background: #0f8f4a;
-    }
-  ` : `
-    background: rgba(255, 255, 255, 0.1);
-    color: #f5f5f5;
-    &:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-  `}
-`;
 
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 80px 20px;
-  color: #a0a0a0;
-  
-  h3 {
-    font-size: 1.5rem;
-    margin-bottom: 12px;
-    color: #666;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${props => props.primary ? '0 10px 30px rgba(147, 51, 234, 0.3)' : 'none'};
   }
-  
-  p {
-    font-size: 1rem;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
-const LoadingState = styled.div`
+const Loading = styled.div`
   text-align: center;
   padding: 80px 20px;
-  color: #0d7a3f;
-  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
 `;
 
-function MyListsPage({ onNavigate }) {
-  const { token, isAuthenticated } = useAuth();
-  const [listas, setListas] = useState([]);
+const MyListsPage = ({ onNavigate, onSelectList }) => {
+  const { lists, loadLists, createList } = useData();
+  const { token } = useAuth();
+
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [novaLista, setNovaLista] = useState({ nome: '', descricao: '' });
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newListName, setNewListName] = useState('');
+  const [newListDescription, setNewListDescription] = useState('');
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      onNavigate('login');
-      return;
-    }
-    fetchListas();
+    fetchLists();
   }, []);
 
-  const fetchListas = async () => {
+  const fetchLists = async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/listas`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setListas(data.listas);
-      }
+      await loadLists(token);
     } catch (error) {
-      console.error('Erro ao buscar listas:', error);
+      console.error('Erro ao carregar listas:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const criarLista = async () => {
-    if (!novaLista.nome.trim()) return;
+  const handleCreateList = async () => {
+    if (!newListName.trim()) return;
 
+    setCreating(true);
     try {
-      const response = await fetch(`${API_URL}/api/listas`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(novaLista)
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setShowModal(false);
-        setNovaLista({ nome: '', descricao: '' });
-        fetchListas();
-      }
+      await createList({ nome: newListName, descricao: newListDescription }, token);
+      setShowCreateModal(false);
+      setNewListName('');
+      setNewListDescription('');
+      fetchLists();
     } catch (error) {
       console.error('Erro ao criar lista:', error);
+      alert('Erro ao criar lista. Tente novamente.');
+    } finally {
+      setCreating(false);
     }
+  };
+
+  const handleListClick = (listId) => {
+    onSelectList(listId);
   };
 
   if (loading) {
     return (
       <PageContainer>
-        <LoadingState>Carregando listas...</LoadingState>
+        <Container>
+          <Loading>Carregando suas listas...</Loading>
+        </Container>
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <Header>
-        <Title>Minhas Listas</Title>
-        <CreateButton onClick={() => setShowModal(true)}>
-          + Nova Lista
-        </CreateButton>
-      </Header>
+      <Container>
+        <Header>
+          <Title>Minhas Listas</Title>
+          <CreateButton
+            onClick={() => setShowCreateModal(true)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span>+</span>
+            Nova Lista
+          </CreateButton>
+        </Header>
 
-      {listas.length === 0 ? (
-        <EmptyState>
-          <h3>Nenhuma lista criada</h3>
-          <p>Crie sua primeira lista para organizar suas mídias favoritas!</p>
-        </EmptyState>
-      ) : (
-        <ListsGrid>
-          {listas.map((lista) => (
-            <ListCard
-              key={lista.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+        {lists && lists.length > 0 ? (
+          <ListsGrid>
+            {lists.map((list, index) => (
+              <ListCard
+                key={list.id}
+                onClick={() => handleListClick(list.id)}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <ListIcon>📋</ListIcon>
+                <ListTitle>{list.nome}</ListTitle>
+                <ListDescription>
+                  {list.descricao || 'Sem descrição'}
+                </ListDescription>
+                <ListStats>
+                  <StatItem>
+                    <StatValue>{list.total_itens || 0}</StatValue>
+                    <StatLabel>Mídias</StatLabel>
+                  </StatItem>
+                  <StatItem>
+                    <StatValue>{new Date(list.criado_em).toLocaleDateString('pt-BR')}</StatValue>
+                    <StatLabel>Criado</StatLabel>
+                  </StatItem>
+                </ListStats>
+              </ListCard>
+            ))}
+          </ListsGrid>
+        ) : (
+          <EmptyState>
+            <EmptyIcon>📝</EmptyIcon>
+            <EmptyText>Você ainda não tem listas</EmptyText>
+            <CreateButton
+              onClick={() => setShowCreateModal(true)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <ListTitle>{lista.nome}</ListTitle>
-              <ListDescription>
-                {lista.descricao || 'Sem descrição'}
-              </ListDescription>
-              <ListInfo>
-                <span>{lista.total_itens} {lista.total_itens === 1 ? 'item' : 'itens'}</span>
-                <span>{new Date(lista.data_criacao).toLocaleDateString('pt-BR')}</span>
-              </ListInfo>
-            </ListCard>
-          ))}
-        </ListsGrid>
-      )}
+              <span>+</span>
+              Criar Primeira Lista
+            </CreateButton>
+          </EmptyState>
+        )}
+      </Container>
 
       <AnimatePresence>
-        {showModal && (
+        {showCreateModal && (
           <Modal
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowModal(false)}
+            onClick={() => !creating && setShowCreateModal(false)}
           >
             <ModalContent
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
               <ModalTitle>Criar Nova Lista</ModalTitle>
-              
               <Input
                 type="text"
-                placeholder="Nome da lista"
-                value={novaLista.nome}
-                onChange={(e) => setNovaLista({ ...novaLista, nome: e.target.value })}
+                placeholder="Nome da lista *"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                disabled={creating}
+                autoFocus
               />
-              
               <TextArea
                 placeholder="Descrição (opcional)"
-                value={novaLista.descricao}
-                onChange={(e) => setNovaLista({ ...novaLista, descricao: e.target.value })}
+                value={newListDescription}
+                onChange={(e) => setNewListDescription(e.target.value)}
+                disabled={creating}
               />
-              
-              <ButtonGroup>
-                <Button onClick={() => setShowModal(false)}>
+              <ModalActions>
+                <ModalButton
+                  onClick={() => setShowCreateModal(false)}
+                  disabled={creating}
+                >
                   Cancelar
-                </Button>
-                <Button primary onClick={criarLista}>
-                  Criar Lista
-                </Button>
-              </ButtonGroup>
+                </ModalButton>
+                <ModalButton
+                  primary
+                  onClick={handleCreateList}
+                  disabled={!newListName.trim() || creating}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {creating ? 'Criando...' : 'Criar Lista'}
+                </ModalButton>
+              </ModalActions>
             </ModalContent>
           </Modal>
         )}
       </AnimatePresence>
     </PageContainer>
   );
-}
+};
 
 export default MyListsPage;

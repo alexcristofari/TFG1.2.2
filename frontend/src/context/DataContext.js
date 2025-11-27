@@ -1,4 +1,4 @@
-// frontend/src/context/DataContext.js (v1.1 - MODO DEPURACAO)
+// frontend/src/context/DataContext.js (v2.0 - COM SUPORTE A LISTAS)
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
@@ -11,6 +11,9 @@ export function DataProvider({ children }) {
   
   const [isLoading, setIsLoading] = useState(true);
   const [loadingStatus, setLoadingStatus] = useState('Iniciando...');
+  
+  // Estado para listas do usuário
+  const [lists, setLists] = useState([]);
 
   useEffect(() => {
     async function fetchAllData() {
@@ -24,8 +27,8 @@ export function DataProvider({ children }) {
         { key: 'moviesGenres', url: '/api/movies/genres' },
       ];
 
-      console.log("--- INICIANDO DEPURACAO DE REDE (FRONTEND) ---");
-      console.log("Tentando buscar as seguintes URLs:", urlsToFetch.map(u => u.url));
+      console.log(\"--- INICIANDO DEPURACAO DE REDE (FRONTEND) ---\");
+      console.log(\"Tentando buscar as seguintes URLs:\", urlsToFetch.map(u => u.url));
       
       try {
         const promises = urlsToFetch.map(item => {
@@ -35,7 +38,7 @@ export function DataProvider({ children }) {
 
         setLoadingStatus('Aquecendo sistemas...');
         const responses = await Promise.all(promises);
-        console.log("[FRONTEND] Todas as promises foram resolvidas com sucesso!");
+        console.log(\"[FRONTEND] Todas as promises foram resolvidas com sucesso!\");
 
         // Mapeia as respostas de volta para os dados
         const dataMap = responses.reduce((acc, response, index) => {
@@ -64,7 +67,7 @@ export function DataProvider({ children }) {
         setIsLoading(false);
 
       } catch (error) {
-        console.error("--- FALHA CRÍTICA NA REDE (FRONTEND) ---", error);
+        console.error(\"--- FALHA CRÍTICA NA REDE (FRONTEND) ---\", error);
         // --- MODO DEPURACAO: Mostra a URL exata que falhou ---
         if (error.response) {
           const failedUrl = error.config.url;
@@ -80,7 +83,121 @@ export function DataProvider({ children }) {
     fetchAllData();
   }, []);
 
-  const value = { gamesData, musicData, moviesData, isLoading, loadingStatus };
+  // ===== FUNÇÕES DE LISTAS =====
+  
+  // Carregar todas as listas do usuário
+  const loadLists = async (token) => {
+    try {
+      const response = await axios.get('/api/listas', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setLists(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[DataContext] Erro ao carregar listas:', error);
+      throw error;
+    }
+  };
+
+  // Criar nova lista
+  const createList = async (listData, token) => {
+    try {
+      const response = await axios.post('/api/listas', listData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      await loadLists(token); // Recarrega as listas
+      return response.data;
+    } catch (error) {
+      console.error('[DataContext] Erro ao criar lista:', error);
+      throw error;
+    }
+  };
+
+  // Obter detalhes de uma lista específica
+  const getListDetails = async (listId, token) => {
+    try {
+      const response = await axios.get(`/api/listas/${listId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('[DataContext] Erro ao obter detalhes da lista:', error);
+      throw error;
+    }
+  };
+
+  // Atualizar lista
+  const updateList = async (listId, listData, token) => {
+    try {
+      const response = await axios.put(`/api/listas/${listId}`, listData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      await loadLists(token); // Recarrega as listas
+      return response.data;
+    } catch (error) {
+      console.error('[DataContext] Erro ao atualizar lista:', error);
+      throw error;
+    }
+  };
+
+  // Deletar lista
+  const deleteList = async (listId, token) => {
+    try {
+      await axios.delete(`/api/listas/${listId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      await loadLists(token); // Recarrega as listas
+    } catch (error) {
+      console.error('[DataContext] Erro ao deletar lista:', error);
+      throw error;
+    }
+  };
+
+  // Adicionar mídia à lista
+  const addMediaToList = async (listId, midiaId, token) => {
+    try {
+      const response = await axios.post(
+        `/api/listas/${listId}/itens`,
+        { midia_id: midiaId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      await loadLists(token); // Recarrega as listas
+      return response.data;
+    } catch (error) {
+      console.error('[DataContext] Erro ao adicionar mídia à lista:', error);
+      throw error;
+    }
+  };
+
+  // Remover mídia da lista
+  const removeMediaFromList = async (listId, itemId, token) => {
+    try {
+      await axios.delete(`/api/listas/${listId}/itens/${itemId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      await loadLists(token); // Recarrega as listas
+    } catch (error) {
+      console.error('[DataContext] Erro ao remover mídia da lista:', error);
+      throw error;
+    }
+  };
+
+  const value = { 
+    gamesData, 
+    musicData, 
+    moviesData, 
+    isLoading, 
+    loadingStatus,
+    lists,
+    loadLists,
+    createList,
+    getListDetails,
+    updateList,
+    deleteList,
+    addMediaToList,
+    removeMediaFromList
+  };
+  
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }
 
