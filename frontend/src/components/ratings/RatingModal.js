@@ -10,7 +10,7 @@ const ModalOverlay = styled(motion.div)`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,7 +19,8 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 30px;
   max-width: 500px;
@@ -79,7 +80,7 @@ const MediaTitle = styled.h3`
 `;
 
 const MediaType = styled.span`
-  color: #9333ea;
+  color: #c7d5e0;
   font-size: 14px;
   font-weight: 500;
   text-transform: uppercase;
@@ -163,7 +164,7 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #9333ea;
+    border-color: rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.08);
   }
 
@@ -180,8 +181,8 @@ const ButtonGroup = styled.div`
 
 const Button = styled(motion.button)`
   flex: 1;
-  background: ${props => props.primary ? 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)' : 'rgba(255, 255, 255, 0.1)'};
-  color: white;
+  background: ${props => props.primary ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.1)'};
+  color: ${props => props.primary ? '#000' : '#fff'};
   border: none;
   border-radius: 12px;
   padding: 14px 28px;
@@ -191,8 +192,8 @@ const Button = styled(motion.button)`
   transition: all 0.3s ease;
 
   &:hover {
+    background: ${props => props.primary ? '#fff' : 'rgba(255, 255, 255, 0.15)'};
     transform: translateY(-2px);
-    box-shadow: ${props => props.primary ? '0 10px 30px rgba(147, 51, 234, 0.3)' : '0 5px 15px rgba(255, 255, 255, 0.1)'};
   }
 
   &:disabled {

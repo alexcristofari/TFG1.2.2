@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+  background: linear-gradient(135deg, #0f0f1e 0%, #040405ff 50%, #050608ff 100%);
   padding: 80px 20px 40px;
 `;
 
@@ -30,9 +30,9 @@ const TitleSection = styled.div`
 `;
 
 const BackButton = styled(motion.button)`
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(20, 20, 20, 0.85);
+  color: #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   padding: 10px 20px;
   font-size: 14px;
@@ -42,7 +42,8 @@ const BackButton = styled(motion.button)`
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(60, 60, 60, 0.9);
+    color: #ffffff;
     transform: translateX(-5px);
   }
 `;
@@ -52,7 +53,7 @@ const Title = styled.h1`
   font-size: 42px;
   font-weight: 700;
   margin: 0 0 10px 0;
-  background: linear-gradient(135deg, #fff 0%, #9333ea 100%);
+  background: linear-gradient(135deg, #fff 0%, #c7d5e0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 `;
@@ -71,9 +72,9 @@ const Actions = styled.div`
 `;
 
 const ActionButton = styled(motion.button)`
-  background: ${props => props.danger ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)'};
-  color: white;
-  border: none;
+  background: ${props => props.danger ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.1)'};
+  color: ${props => props.danger ? '#ef4444' : '#e0e0e0'};
+  border: 1px solid ${props => props.danger ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.08)'};
   border-radius: 12px;
   padding: 12px 24px;
   font-size: 14px;
@@ -82,8 +83,8 @@ const ActionButton = styled(motion.button)`
   transition: all 0.3s ease;
 
   &:hover {
+    background: ${props => props.danger ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.15)'};
     transform: translateY(-2px);
-    box-shadow: ${props => props.danger ? '0 10px 30px rgba(239, 68, 68, 0.3)' : '0 10px 30px rgba(147, 51, 234, 0.3)'};
   }
 `;
 
@@ -95,15 +96,15 @@ const Stats = styled.div`
 `;
 
 const StatItem = styled.div`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 15px;
   padding: 20px 30px;
   text-align: center;
 `;
 
 const StatValue = styled.div`
-  color: #9333ea;
+  color: #e0e0e0;
   font-size: 32px;
   font-weight: 700;
   margin-bottom: 5px;
@@ -124,10 +125,11 @@ const MediaGrid = styled.div`
 `;
 
 const MediaCard = styled(motion.div)`
-  background: linear-gradient(135deg, rgba(30, 30, 46, 0.8) 0%, rgba(42, 42, 62, 0.8) 100%);
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -135,15 +137,16 @@ const MediaCard = styled(motion.div)`
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(147, 51, 234, 0.3);
-    border-color: #9333ea;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(30, 30, 30, 0.7);
   }
 `;
 
 const MediaImage = styled.div`
   width: 100%;
   height: 180px;
-  background: ${props => props.src ? `url(${props.src})` : 'linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%)'};
+  background: ${props => props.src ? `url(${props.src})` : 'rgba(40, 40, 40, 0.8)'};
   background-size: cover;
   background-position: center;
   border-radius: 12px;
@@ -153,6 +156,7 @@ const MediaImage = styled.div`
   justify-content: center;
   color: rgba(255, 255, 255, 0.3);
   font-size: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 `;
 
 const MediaTitle = styled.h3`
@@ -166,7 +170,7 @@ const MediaTitle = styled.h3`
 `;
 
 const MediaType = styled.div`
-  color: #9333ea;
+  color: #c7d5e0;
   font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
@@ -210,8 +214,8 @@ const EmptyText = styled.p`
 `;
 
 const EmptyButton = styled(motion.button)`
-  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
-  color: white;
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
   border: none;
   border-radius: 12px;
   padding: 14px 32px;
@@ -221,8 +225,8 @@ const EmptyButton = styled(motion.button)`
   transition: all 0.3s ease;
 
   &:hover {
+    background: #fff;
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(147, 51, 234, 0.3);
   }
 `;
 
@@ -248,7 +252,8 @@ const Modal = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 30px;
   max-width: 500px;
@@ -276,7 +281,7 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #9333ea;
+    border-color: rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.08);
   }
 `;
@@ -297,7 +302,7 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #9333ea;
+    border-color: rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.08);
   }
 `;
@@ -309,8 +314,8 @@ const ModalActions = styled.div`
 
 const ModalButton = styled(motion.button)`
   flex: 1;
-  background: ${props => props.primary ? 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)' : 'rgba(255, 255, 255, 0.1)'};
-  color: white;
+  background: ${props => props.primary ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.1)'};
+  color: ${props => props.primary ? '#000' : '#fff'};
   border: none;
   border-radius: 12px;
   padding: 14px 28px;
@@ -321,6 +326,7 @@ const ModalButton = styled(motion.button)`
 
   &:hover {
     transform: translateY(-2px);
+    background: ${props => props.primary ? '#fff' : 'rgba(255, 255, 255, 0.15)'};
   }
 `;
 

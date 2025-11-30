@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+  background: linear-gradient(135deg, #030305ff 0%, #07070aff 50%, #050607ff 100%);
   padding: 80px 20px 40px;
 `;
 
@@ -29,15 +29,15 @@ const Title = styled.h1`
   font-size: 48px;
   font-weight: 700;
   margin: 0;
-  background: linear-gradient(135deg, #fff 0%, #9333ea 100%);
+  background: linear-gradient(135deg, #fff 0%, #c7d5e0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 `;
 
 const CreateButton = styled(motion.button)`
-  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
-  color: white;
-  border: none;
+  background: rgba(20, 20, 20, 0.85);
+  color: #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 15px;
   padding: 14px 32px;
   font-size: 16px;
@@ -49,8 +49,10 @@ const CreateButton = styled(motion.button)`
   transition: all 0.3s ease;
 
   &:hover {
+    background: rgba(60, 60, 60, 0.9);
+    color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(147, 51, 234, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   }
 `;
 
@@ -61,10 +63,11 @@ const ListsGrid = styled.div`
 `;
 
 const ListCard = styled(motion.div)`
-  background: linear-gradient(135deg, rgba(30, 30, 46, 0.8) 0%, rgba(42, 42, 62, 0.8) 100%);
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -72,15 +75,17 @@ const ListCard = styled(motion.div)`
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(147, 51, 234, 0.3);
-    border-color: #9333ea;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(30, 30, 30, 0.7);
   }
 `;
 
 const ListIcon = styled.div`
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  background: rgba(40, 40, 40, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 15px;
   display: flex;
   align-items: center;
@@ -118,7 +123,7 @@ const StatItem = styled.div`
 `;
 
 const StatValue = styled.span`
-  color: #9333ea;
+  color: #e0e0e0;
   font-size: 20px;
   font-weight: 700;
 `;
@@ -162,7 +167,8 @@ const Modal = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 40px;
   max-width: 500px;
@@ -190,7 +196,7 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #9333ea;
+    border-color: rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.08);
   }
 
@@ -215,7 +221,7 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #9333ea;
+    border-color: rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.08);
   }
 
@@ -231,8 +237,8 @@ const ModalActions = styled.div`
 
 const ModalButton = styled(motion.button)`
   flex: 1;
-  background: ${props => props.primary ? 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)' : 'rgba(255, 255, 255, 0.1)'};
-  color: white;
+  background: ${props => props.primary ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.1)'};
+  color: ${props => props.primary ? '#000' : '#fff'};
   border: none;
   border-radius: 12px;
   padding: 16px 32px;
@@ -243,7 +249,7 @@ const ModalButton = styled(motion.button)`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: ${props => props.primary ? '0 10px 30px rgba(147, 51, 234, 0.3)' : 'none'};
+    background: ${props => props.primary ? '#fff' : 'rgba(255, 255, 255, 0.15)'};
   }
 
   &:disabled {

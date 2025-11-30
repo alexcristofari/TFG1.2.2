@@ -7,7 +7,7 @@ import RatingModal from './RatingModal';
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+  background: linear-gradient(135deg, #000007ff 0%, #07070cff 50%, #060708ff 100%);
   padding: 80px 20px 40px;
 `;
 
@@ -25,7 +25,7 @@ const Title = styled.h1`
   font-size: 48px;
   font-weight: 700;
   margin: 0 0 10px 0;
-  background: linear-gradient(135deg, #fff 0%, #9333ea 100%);
+  background: linear-gradient(135deg, #fff 0%, #c7d5e0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 `;
@@ -43,16 +43,18 @@ const RatingsGrid = styled.div`
 `;
 
 const RatingCard = styled(motion.div)`
-  background: linear-gradient(135deg, rgba(30, 30, 46, 0.8) 0%, rgba(42, 42, 62, 0.8) 100%);
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(147, 51, 234, 0.3);
-    border-color: #9333ea;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(30, 30, 30, 0.7);
   }
 `;
 
@@ -76,7 +78,7 @@ const MediaTitle = styled.h3`
 `;
 
 const MediaType = styled.span`
-  color: #9333ea;
+  color: #c7d5e0;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -84,7 +86,8 @@ const MediaType = styled.span`
 `;
 
 const RatingBadge = styled.div`
-  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
   border-radius: 12px;
   padding: 8px 16px;
@@ -117,9 +120,9 @@ const Date = styled.span`
 `;
 
 const EditButton = styled(motion.button)`
-  background: rgba(147, 51, 234, 0.2);
-  color: #9333ea;
-  border: 1px solid rgba(147, 51, 234, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   padding: 8px 16px;
   font-size: 13px;
@@ -128,7 +131,7 @@ const EditButton = styled(motion.button)`
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(147, 51, 234, 0.3);
+    background: rgba(255, 255, 255, 0.15);
     transform: scale(1.02);
   }
 `;

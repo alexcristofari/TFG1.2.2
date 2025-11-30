@@ -1,4 +1,3 @@
-// frontend/src/components/movies/MovieCard.js (v5.0 - Padrão Ouro Netflix)
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import AddToListModal from '../lists/AddToListModal';
@@ -124,7 +123,8 @@ const CardStyles = () => (
       position: absolute;
       top: 8px;
       right: 8px;
-      background: linear-gradient(135deg, rgba(229, 9, 20, 0.95), rgba(180, 7, 16, 0.95));
+      background-color: rgba(0, 0, 0, 0.8); /* Fundo preto */
+      border: 1px solid #333; /* Borda sutil */
       color: #ffffff;
       padding: 0.3rem 0.6rem;
       border-radius: 50px;
