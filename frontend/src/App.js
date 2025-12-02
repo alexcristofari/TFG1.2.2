@@ -77,19 +77,52 @@ function AppContent() {
     </button>
   );
 
-  // Se não estiver na home e os dados estiverem carregando, mostra tela de loading
-  if (isLoading && activeSystem !== 'home' && activeSystem !== 'login' && activeSystem !== 'register') {
+  // ======= AQUI É A TELA DE LOADING GLOBAL (CORRIGIDA) =======
+  // Se não estiver na home/login/register e os dados estiverem carregando,
+  // mostra tela de loading
+  if (
+    isLoading &&
+    activeSystem !== 'home' &&
+    activeSystem !== 'login' &&
+    activeSystem !== 'register'
+  ) {
     return (
-      <div style={{
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        backgroundColor: '#121a25', color: '#c7d5e0', flexDirection: 'column'
-      }}>
-        <h1 style={{ color: '#66c0f4', fontWeight: 300, fontSize: '2.5rem' }}>Recomendador Multimídia</h1>
-        <p style={{ fontSize: '1.2rem', marginTop: '-1rem' }}>{loadingStatus}</p>
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#0a0a0a',        // ERA #121a25 (azulado) → AGORA PRETO
+          color: '#f5f5f5',                  // ERA #c7d5e0 → agora texto claro neutro
+          flexDirection: 'column'
+        }}
+      >
+        <h1
+          style={{
+            color: '#66c0f4',
+            fontWeight: 300,
+            fontSize: '2.5rem'
+          }}
+        >
+          Recomendador Multimídia
+        </h1>
+        <p
+          style={{
+            fontSize: '1.2rem',
+            marginTop: '-1rem'
+          }}
+        >
+          {loadingStatus}
+        </p>
       </div>
     );
   }
+  // ===========================================================
 
   // Renderiza o sistema ativo
   const renderActiveSystem = () => {
@@ -119,7 +152,7 @@ function AppContent() {
         return (
           <>
             {renderBackButton()}
-            <MyListsPage 
+            <MyListsPage
               onNavigate={setActiveSystem}
               onSelectList={(listaId) => {
                 setSelectedListaId(listaId);
@@ -132,7 +165,7 @@ function AppContent() {
         return (
           <>
             {renderBackButton()}
-            <ListDetailPage 
+            <ListDetailPage
               listaId={selectedListaId}
               onNavigate={setActiveSystem}
             />
@@ -160,7 +193,7 @@ function AppContent() {
       default:
         // Passa as funções para abrir os modais para a HomePage
         return (
-          <HomePage 
+          <HomePage
             onSelectSystem={setActiveSystem}
             onOpenAbout={() => setShowAbout(true)}
             onOpenContact={() => setShowContact(true)}
@@ -171,13 +204,17 @@ function AppContent() {
 
   return (
     <div className="App">
-      <main>
-        {renderActiveSystem()}
-      </main>
-      
+      <main>{renderActiveSystem()}</main>
+
       {/* Renderiza os modais fora do switch, controlados pelos estados showAbout/showContact */}
-      <AboutSimilarity isOpen={showAbout} onClose={() => setShowAbout(false)} />
-      <ContactPage isOpen={showContact} onClose={() => setShowContact(false)} />
+      <AboutSimilarity
+        isOpen={showAbout}
+        onClose={() => setShowAbout(false)}
+      />
+      <ContactPage
+        isOpen={showContact}
+        onClose={() => setShowContact(false)}
+      />
     </div>
   );
 }

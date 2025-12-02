@@ -1,0 +1,28 @@
+# fly.toml file for api-gateway
+app = "tfg-api-gateway"
+primary_region = "gru" # Escolha a região mais próxima do seu público (ex: gru para São Paulo)
+
+[build]
+  # Usa o Dockerfile na raiz do projeto
+  dockerfile = "../Dockerfile"
+  # Usa o target específico para o API Gateway
+  target = "api-gateway"
+
+[env]
+  # URLs internas para comunicação segura e rápida
+  GAMES_API_URL = "http://tfg-steam-backend.internal:8080/api/games"
+  MUSIC_API_URL = "http://tfg-music-backend.internal:8080/api/music"
+  MOVIES_API_URL = "http://tfg-movies-backend.internal:8080/api/movies"
+  
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "512mb"
